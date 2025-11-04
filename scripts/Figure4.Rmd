@@ -21,8 +21,10 @@ theme_set(theme_cowplot(font_size = 8, line_size = 0.25))
 ## Read in data
 
 ```{r}
-dat <- get_data(read_all = TRUE)
+dat <- get_data(read_all = FALSE)
 cn_arm <- dat$cnarm
+cnarm <- fread(file.path(config$basedir,"zenododirectory/normal_breast/cn_arm.csv.gz"))
+
 cndat_md <- distinct(dat$metrics, cell_id,cell_type1, sample, genotype, organoid)
 cn_arm <- left_join(cn_arm, cndat_md)
 ```

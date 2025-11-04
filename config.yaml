@@ -3,7 +3,7 @@
 
 #basedir: '/juno/work/shah/users/william1/projects/brugge/results/'
 basedir: "data"
-cancerdir: "cancer_data/"
+cancerdir: "data/cancer_data/"
 
 supplementary_tables: "metadata/TablesFinal.xlsx"
 
