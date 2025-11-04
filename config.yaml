@@ -2,10 +2,10 @@
 #signals: '/home/william1/bin/R/signals/'
 
 #basedir: '/juno/work/shah/users/william1/projects/brugge/results/'
-basedir: "dir"
+basedir: "data"
 cancerdir: "cancer_data/"
 
-supplementary_tables: "TablesFinal.xlsx"
+supplementary_tables: "metadata/TablesFinal.xlsx"
 
 #plotting
 font_size: 7

@@ -1,2 +1,6 @@
 .Rproj.user
 config_ceto.yaml
+.DS_Store
+data/
+.Rhistory
+normal_brca_scdna.Rproj
