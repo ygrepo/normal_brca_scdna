@@ -95,6 +95,8 @@ pl_cancer <- cancer %>%
   plottinglist_()
 
 cn <- fread(file.path(config$basedir, "zenododirectory/normal_breast/cn.csv.gz"))
+cn <- fread(file.path("data/tnbc.cnv.csv"))
+cn %>% glimpse()
 
 md <- metrics[keep_cell == TRUE] %>% 
   add_count(sample) %>% 
@@ -148,3 +150,48 @@ for (mysample in unique(cell_list$sample)){
   dev.off()
 }
 
+make_heatmap_tree <- function(mysample, clusters = NULL){
+  
+  mytree <- ape::read.tree(file = paste0(config$basedir,  glue::glue("/zenododirectory/trees/{mysample}-sitka-processed.newick")))
+  if (!is.null(clusters)){
+    mytree <- ape::keep.tip(mytree, clusters$cell_id)
+  }
+  cellorder <- mytree$tip.label[mytree$edge[, 2]]
+  cnaneuploid <- dat$cn %>% filter(cell_id %in% mytree$tip.label)
+  my_title <- ""
+  chroms <- c(paste0(1:11), "13", "15", "17", "20", "X")
+  p <- plotHeatmap(cnaneuploid, 
+                   tree = mytree %>% ape::ladderize(),
+                   column_title = my_title,
+                   column_title_gp = gpar(fontsize = 8),
+                   linkheight = 2,
+                   chrlabels = chroms,
+                   show_heatmap_legend = F,
+                   plotfrequency = F, 
+                   frequency_height = 0.5,
+                   anno_width = 0.02,
+                   annofontsize = 7,
+                   show_legend = F,
+                   show_clone_text = F,
+                   show_library_label = F,
+                   show_clone_label = F,
+                   plottree = T,
+                   reorderclusters = T,
+                   tree_width = 1,
+                   clone_pal = c("A" = "firebrick4", "B"= "deepskyblue4"),
+                   clusters = clusters)
+  pout <- grid.grabExpr(draw(p), width = 89 * 0.039, height = 2)
+  return(list(hm = pout, tree = mytree))
+}
+
+cnarm <- fread(file.path(config$basedir,"zenododirectory/normal_breast/cn_arm.csv.gz"))
+
+mytree <- ape::read.tree(file = paste0(config$basedir,  glue::glue("/zenododirectory/trees/B2-16-sitka-processed.newick")))
+myclusters <- data.frame(cell_id = mytree$tip.label)
+myclusters <- data.frame(cell_id = mytree$tip.label) %>% 
+  mutate(clone_id = ifelse(cell_id %in% c("SA1150-A95735B-R42-C51", "SA1150-A95735B-R34-C35", "SA1150-A95735B-R44-C60", "SA1150-A95735B-R43-C30"), "A", "B")) %>% 
+  left_join(metrics %>% select(cell_id, ploidy)) %>% 
+  filter(ploidy == 2)
+hm_B2_16 <- make_heatmap_tree("B2-16", clusters = myclusters)
+hm_B1_49 <- make_heatmap_tree("B1-49")
+hm_B2_18 <- make_heatmap_tree("B2-18")
